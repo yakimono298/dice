@@ -36,8 +36,8 @@
     }
 
     #diceImg {
-      width: 240px;
-      height: 240px;
+      width: min(240px, 50vw);
+      height: min(240px, 50vw);
       object-fit: contain;
       transform-origin: center;
     }
@@ -74,7 +74,7 @@
      }
 
     40% {
-      transform: scale(1.35);
+      transform: scale(1.15);
       filter: drop-shadow(0 0 30px gold)
             drop-shadow(0 0 50px yellow);
     }
