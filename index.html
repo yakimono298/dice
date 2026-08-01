@@ -1,117 +1,76 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>サイコロ</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    button { padding: 10px 16px; cursor: pointer; }
-
-    #result { margin-top: 16px; font-weight: bold; }
-    #diceWrap {
-      margin-top: 14px;
-      width: 140px;
-      height: 140px;
-      display: grid;
-      place-items: center;
-      border: 1px dashed #ccc;
-      border-radius: 10px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ヒントサイコロ</title>
+<style>
+    body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #f5f5f5;
+        margin-top: 80px;
     }
 
-    #diceImg {
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-      transform-origin: center;
+    h1 {
+        color: #333;
     }
 
-    /* 🎞️ 振っている間のアニメーション */
-    .shaking #diceImg {
-      animation: shake 0.12s infinite linear;
-      filter: saturate(1.2);
+    button {
+        font-size: 24px;
+        padding: 15px 40px;
+        cursor: pointer;
+        border: none;
+        border-radius: 10px;
+        background: #4CAF50;
+        color: white;
     }
 
-    @keyframes shake {
-      0%   { transform: rotate(0deg)   translateX(0px) translateY(0px) scale(1); }
-      25%  { transform: rotate(12deg)  translateX(3px) translateY(-2px) scale(1.02); }
-      50%  { transform: rotate(-10deg) translateX(-3px) translateY(2px) scale(0.99); }
-      75%  { transform: rotate(8deg)   translateX(2px) translateY(-1px) scale(1.01); }
-      100% { transform: rotate(0deg)   translateX(0px) translateY(0px) scale(1); }
+    button:hover {
+        background: #45a049;
     }
 
-    /* ボタン押下中は無効化して事故防止 */
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    #result {
+        margin-top: 40px;
+        font-size: 28px;
+        font-weight: bold;
+        white-space: pre-wrap;
     }
-  </style>
+
+    .hint {
+        color: #d35400;
+    }
+
+    .miss {
+        color: #555;
+    }
+</style>
 </head>
 <body>
-  <h1>サイコロを振ろう🎲</h1>
 
-  <button id="rollBtn">サイコロを振る</button>
+<h1>🎲 サイコロを振る</h1>
 
-  <div id="diceWrap" class="idle">
-    <img id="diceImg" src="images/dice-1.png" alt="サイコロの目" />
-  </div>
+<button onclick="rollDice()">サイコロを振る！</button>
 
-  <div id="diceText">出目：—</div>
-  <div id="result">ここに結果が出ます</div>
+<div id="result"></div>
 
-  <script>
-    const rollBtn = document.getElementById("rollBtn");
-    const diceImg = document.getElementById("diceImg");
-    const diceText = document.getElementById("diceText");
+<script>
+function rollDice() {
+    const dice = Math.floor(Math.random() * 6) + 1;
     const result = document.getElementById("result");
-    const diceWrap = document.getElementById("diceWrap");
 
-    // 画像パス（必要ならここだけ変更）
-    const imgPath = (n) => `images/dice-${n}.png`;
-
-    function setDice(n) {
-      diceImg.src = imgPath(n);
-      diceText.textContent = `出目：${n}`;
+    if (dice === 1) {
+        result.className = "hint";
+        result.innerHTML =
+            `🎉 出目：${dice}<br><br>` +
+            `ヒント：ポスターは、ただの飾りではない。そこにも事件の手掛かりが隠されている。`;
+    } else {
+        result.className = "miss";
+        result.innerHTML =
+            `🎲 出目：${dice}<br><br>残念`;
     }
+}
+</script>
 
-    rollBtn.addEventListener("click", () => {
-      // 押している間は連打しない
-      rollBtn.disabled = true;
-
-      // 🎞️ アニメーション開始
-      diceWrap.classList.add("shaking");
-      result.textContent = "振っています…";
-
-      // まずランダムに見せる（チラチラ切替）
-      // 最終的に "dice"（当たり）へ確定させる
-      const finalDice = Math.floor(Math.random() * 6) + 1;
-
-      let ticks = 0;
-      const interval = setInterval(() => {
-        const temp = Math.floor(Math.random() * 6) + 1;
-        setDice(temp);
-        ticks++;
-
-        // 振る時間（例：0.9秒）
-        if (ticks >= 8) {
-          clearInterval(interval);
-
-          // 🎯 確定
-          setDice(finalDice);
-
-          if (finalDice === 1) {
-            result.textContent =
-              "ヒント：ポスターは、ただの飾りではない。そこにも事件の手掛かりが隠されている。";
-          } else {
-            result.textContent = "残念";
-          }
-
-          // 🎞️ アニメーション停止
-          diceWrap.classList.remove("shaking");
-          rollBtn.disabled = false;
-        }
-      }, 110);
-    });
-  </script>
 </body>
 </html>
