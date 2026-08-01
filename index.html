@@ -7,8 +7,44 @@
   <style>
     body { font-family: sans-serif; padding: 20px; }
     button { padding: 10px 16px; cursor: pointer; }
+
     #result { margin-top: 16px; font-weight: bold; }
-    #dice { font-size: 20px; margin-top: 10px; }
+    #diceWrap {
+      margin-top: 14px;
+      width: 140px;
+      height: 140px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed #ccc;
+      border-radius: 10px;
+    }
+
+    #diceImg {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      transform-origin: center;
+    }
+
+    /* 🎞️ 振っている間のアニメーション */
+    .shaking #diceImg {
+      animation: shake 0.12s infinite linear;
+      filter: saturate(1.2);
+    }
+
+    @keyframes shake {
+      0%   { transform: rotate(0deg)   translateX(0px) translateY(0px) scale(1); }
+      25%  { transform: rotate(12deg)  translateX(3px) translateY(-2px) scale(1.02); }
+      50%  { transform: rotate(-10deg) translateX(-3px) translateY(2px) scale(0.99); }
+      75%  { transform: rotate(8deg)   translateX(2px) translateY(-1px) scale(1.01); }
+      100% { transform: rotate(0deg)   translateX(0px) translateY(0px) scale(1); }
+    }
+
+    /* ボタン押下中は無効化して事故防止 */
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -16,25 +52,65 @@
 
   <button id="rollBtn">サイコロを振る</button>
 
-  <div id="dice">出目：—</div>
+  <div id="diceWrap" class="idle">
+    <img id="diceImg" src="images/dice-1.png" alt="サイコロの目" />
+  </div>
+
+  <div id="diceText">出目：—</div>
   <div id="result">ここに結果が出ます</div>
 
   <script>
     const rollBtn = document.getElementById("rollBtn");
-    const diceElem = document.getElementById("dice");
+    const diceImg = document.getElementById("diceImg");
+    const diceText = document.getElementById("diceText");
     const result = document.getElementById("result");
+    const diceWrap = document.getElementById("diceWrap");
+
+    // 画像パス（必要ならここだけ変更）
+    const imgPath = (n) => `images/dice-${n}.png`;
+
+    function setDice(n) {
+      diceImg.src = imgPath(n);
+      diceText.textContent = `出目：${n}`;
+    }
 
     rollBtn.addEventListener("click", () => {
-      const dice = Math.floor(Math.random() * 6) + 1; // 1〜6
+      // 押している間は連打しない
+      rollBtn.disabled = true;
 
-      diceElem.textContent = `出目：${dice}`;
+      // 🎞️ アニメーション開始
+      diceWrap.classList.add("shaking");
+      result.textContent = "振っています…";
 
-      if (dice === 1) {
-        result.textContent =
-          "ヒント：ポスターは、ただの飾りではない。そこにも事件の手掛かりが隠されている。";
-      } else {
-        result.textContent = "残念";
-      }
+      // まずランダムに見せる（チラチラ切替）
+      // 最終的に "dice"（当たり）へ確定させる
+      const finalDice = Math.floor(Math.random() * 6) + 1;
+
+      let ticks = 0;
+      const interval = setInterval(() => {
+        const temp = Math.floor(Math.random() * 6) + 1;
+        setDice(temp);
+        ticks++;
+
+        // 振る時間（例：0.9秒）
+        if (ticks >= 8) {
+          clearInterval(interval);
+
+          // 🎯 確定
+          setDice(finalDice);
+
+          if (finalDice === 1) {
+            result.textContent =
+              "ヒント：ポスターは、ただの飾りではない。そこにも事件の手掛かりが隠されている。";
+          } else {
+            result.textContent = "残念";
+          }
+
+          // 🎞️ アニメーション停止
+          diceWrap.classList.remove("shaking");
+          rollBtn.disabled = false;
+        }
+      }, 110);
     });
   </script>
 </body>
