@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>サイコロ</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    button { padding: 10px 16px; cursor: pointer; }
+    #result { margin-top: 16px; font-weight: bold; }
+    #dice { font-size: 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>サイコロを振ろう🎲</h1>
+
+  <button id="rollBtn">サイコロを振る</button>
+
+  <div id="dice">出目：—</div>
+  <div id="result">ここに結果が出ます</div>
+
+  <script>
+    const rollBtn = document.getElementById("rollBtn");
+    const diceElem = document.getElementById("dice");
+    const result = document.getElementById("result");
+
+    rollBtn.addEventListener("click", () => {
+      const dice = Math.floor(Math.random() * 6) + 1; // 1〜6
+
+      diceElem.textContent = `出目：${dice}`;
+
+      if (dice === 1) {
+        result.textContent =
+          "ヒント：ポスターは、ただの飾りではない。そこにも事件の手掛かりが隠されている。";
+      } else {
+        result.textContent = "残念";
+      }
+    });
+  </script>
+</body>
+</html>
